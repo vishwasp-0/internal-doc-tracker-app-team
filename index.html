@@ -446,16 +446,29 @@
             fetch('files.json')
                 .then(response => response.json())
                 .then(files => {
-                    displayFileList(files);
+                    if (files && files.length > 0) {
+                        displayFileList(files);
+                    } else {
+                        showEmptyState();
+                    }
                 })
                 .catch(error => {
                     console.error('Error loading files.json:', error);
-                    // Fallback: show default files
-                    displayFileList([
-                        { filename: 'index.html', title: 'Main Tracker', description: 'Primary tech changes tracker' },
-                        { filename: 'tech-changes-tracker.html', title: 'Tech Changes Tracker', description: 'Alternative tracker instance' }
-                    ]);
+                    showEmptyState();
                 });
+        }
+
+        function showEmptyState() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = `
+                <div class="no-results">
+                    <p>No HTML tracker files found.</p>
+                    <p style="margin-top: 16px; font-size: 12px; color: #999;">
+                        Add HTML files to the directory and run:<br>
+                        <code style="background: #f5f5f5; padding: 4px 8px; border-radius: 4px;">node auto-update-files.js</code>
+                    </p>
+                </div>
+            `;
         }
 
         function displayFileList(files) {

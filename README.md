@@ -130,15 +130,23 @@ Works in all modern browsers that support:
 
 ## Multiple HTML Files
 
-The tracker supports multiple HTML tracker files. After login, you'll see a file browser listing all available trackers:
+The tracker automatically discovers HTML files in the directory. Just add an HTML file and it will appear in the file browser!
 
-1. **Add a new HTML file** - Create your tracker HTML file
-2. **Update files.json** - Add the file to the list:
+### Adding a New HTML File
+
+1. **Add your HTML file** to the directory (e.g., `my-tracker.html`)
+2. **Auto-update files.json** (runs automatically on commit, or run manually):
    ```bash
-   node update-files-list.js your-file.html "Your Title" "Description"
+   node auto-update-files.js
    ```
-3. **Each file has separate data** - Each HTML file uses its own localStorage key (`techChanges_<filename>`)
-4. **Navigate between files** - Use the file browser to switch between trackers
+3. **Commit and push**:
+   ```bash
+   git add my-tracker.html files.json
+   git commit -m "Add my-tracker.html"
+   git push
+   ```
+
+**Note:** A git pre-commit hook automatically runs `auto-update-files.js` to keep `files.json` in sync with your HTML files.
 
 ## Files
 

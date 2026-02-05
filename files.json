@@ -1,12 +1,7 @@
 [
-    {
-        "filename": "index.html",
-        "title": "Main Tracker",
-        "description": "Primary tech changes tracker"
-    },
-    {
-        "filename": "tech-changes-tracker.html",
-        "title": "Tech Changes Tracker",
-        "description": "Alternative tracker instance"
-    }
+  {
+    "filename": "tech-changes-tracker.html",
+    "title": "Tech Changes Tracker",
+    "description": "Alternative tracker instance"
+  }
 ]
