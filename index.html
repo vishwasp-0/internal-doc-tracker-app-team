@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tech Changes Tracker</title>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <title>Tech Changes Tracker - File Browser</title>
     <style>
         * {
             margin: 0;
@@ -305,22 +304,6 @@
             font-size: 14px;
         }
 
-        .file-browser {
-            display: none;
-        }
-
-        .file-browser.active {
-            display: block;
-        }
-
-        #trackerView {
-            display: none;
-        }
-
-        #trackerView.active {
-            display: block;
-        }
-
         .file-list {
             display: grid;
             gap: 16px;
@@ -330,7 +313,8 @@
             background: white;
             border: 1px solid #e0e0e0;
             padding: 24px;
-            cursor: pointer;
+            text-decoration: none;
+            display: block;
             transition: border-color 0.2s;
         }
 
@@ -357,23 +341,6 @@
             font-size: 14px;
             color: #666;
             line-height: 1.5;
-        }
-
-        .back-btn {
-            padding: 8px 16px;
-            background: transparent;
-            color: #666;
-            border: 1px solid #e0e0e0;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 400;
-            transition: all 0.2s;
-            margin-bottom: 24px;
-        }
-
-        .back-btn:hover {
-            border-color: #1a1a1a;
-            color: #1a1a1a;
         }
 
         .tag {
@@ -431,28 +398,11 @@
 
     <!-- Main Content -->
     <div class="main-container" id="mainContainer">
-        <!-- File Browser View -->
-        <div class="file-browser active" id="fileBrowser">
-            <div class="header">
-                <h1>Tech Changes Trackers</h1>
-                <button class="logout-btn" onclick="logout()">Logout</button>
-            </div>
-            <div class="file-list" id="fileList"></div>
+        <div class="header">
+            <h1>Tech Changes Trackers</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
-
-        <!-- Tracker View -->
-        <div class="file-browser" id="trackerView">
-            <button class="back-btn" onclick="showFileBrowser()">← Back to Files</button>
-            <div class="header">
-                <h1>Tech Changes Tracker</h1>
-                <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="Search">
-                    <span class="search-icon">⌕</span>
-                </div>
-                <button class="logout-btn" onclick="logout()">Logout</button>
-            </div>
-            <div class="entries-container" id="entriesContainer"></div>
-        </div>
+        <div class="file-list" id="fileList"></div>
     </div>
 
     <script>
@@ -462,23 +412,10 @@
             password: 'internal2024'
         };
 
-        // Initialize Mermaid
-        mermaid.initialize({ 
-            startOnLoad: true,
-            theme: 'neutral',
-            flowchart: {
-                useMaxWidth: true,
-                htmlLabels: true
-            }
-        });
-
-        // Current tracker file being viewed
-        let currentTrackerFile = null;
 
         // Check if user is already logged in
         if (localStorage.getItem('isAuthenticated') === 'true') {
             showMainContainer();
-            loadFileBrowser();
         }
 
         // Login form handler
@@ -490,6 +427,7 @@
             if (username === CREDENTIALS.username && password === CREDENTIALS.password) {
                 localStorage.setItem('isAuthenticated', 'true');
                 showMainContainer();
+                loadFileBrowser();
             } else {
                 document.getElementById('errorMessage').style.display = 'block';
                 setTimeout(() => {
@@ -497,14 +435,6 @@
                 }, 3000);
             }
         });
-
-        // Search functionality
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('input', function(e) {
-                filterEntries(e.target.value.toLowerCase());
-            });
-        }
 
         function showMainContainer() {
             document.getElementById('loginContainer').style.display = 'none';
@@ -531,26 +461,12 @@
         function displayFileList(files) {
             const fileList = document.getElementById('fileList');
             fileList.innerHTML = files.map(file => `
-                <div class="file-item" onclick="openTracker('${file.filename}')">
+                <a href="${file.filename}" class="file-item">
                     <div class="file-item-title">${file.title}</div>
                     <div class="file-item-filename">${file.filename}</div>
                     <div class="file-item-description">${file.description || ''}</div>
-                </div>
+                </a>
             `).join('');
-        }
-
-        function openTracker(filename) {
-            currentTrackerFile = filename;
-            document.getElementById('fileBrowser').classList.remove('active');
-            document.getElementById('trackerView').classList.add('active');
-            loadEntries();
-        }
-
-        function showFileBrowser() {
-            currentTrackerFile = null;
-            document.getElementById('trackerView').classList.remove('active');
-            document.getElementById('fileBrowser').classList.add('active');
-            loadFileBrowser();
         }
 
         function logout() {
@@ -561,230 +477,7 @@
             document.getElementById('password').value = '';
         }
 
-        function loadEntries() {
-            // Load from localStorage, use filename-based key
-            const storageKey = currentTrackerFile ? `techChanges_${currentTrackerFile}` : 'techChanges';
-            let entries = [];
-            const stored = localStorage.getItem(storageKey);
-            if (stored) {
-                entries = JSON.parse(stored);
-            }
-            displayEntries(entries);
-        }
 
-        function filterEntries(searchTerm) {
-            const storageKey = currentTrackerFile ? `techChanges_${currentTrackerFile}` : 'techChanges';
-            const stored = localStorage.getItem(storageKey);
-            const entries = stored ? JSON.parse(stored) : [];
-            
-            if (!searchTerm) {
-                displayEntries(entries);
-                return;
-            }
-
-            const filtered = entries.filter(entry => {
-                const searchableText = [
-                    entry.title,
-                    entry.description,
-                    entry.date,
-                    entry.author || '',
-                    entry.prLink || '',
-                    entry.figmaLink || '',
-                    ...entry.changes,
-                    entry.decisions,
-                    ...(entry.tags || [])
-                ].join(' ').toLowerCase();
-                
-                return searchableText.includes(searchTerm);
-            });
-
-            displayEntries(filtered);
-        }
-
-        function displayEntries(entries) {
-            const container = document.getElementById('entriesContainer');
-            
-            if (entries.length === 0) {
-                const searchTerm = document.getElementById('searchInput').value;
-                const message = searchTerm 
-                    ? 'No entries found matching your search.' 
-                    : 'No entries yet. Use updateTechChanges() in the console to add your first entry.';
-                container.innerHTML = `<div class="no-results">${message}</div>`;
-                return;
-            }
-
-            container.innerHTML = entries.map((entry, index) => {
-                const tagsHtml = (entry.tags || []).map(tag => 
-                    `<span class="tag">${tag}</span>`
-                ).join('');
-
-                const changesHtml = entry.changes.map(change => 
-                    `<li>${change}</li>`
-                ).join('');
-
-                const mermaidHtml = entry.diagram ? 
-                    `<div class="mermaid-container">
-                        <div class="mermaid">${entry.diagram}</div>
-                    </div>` : '';
-
-                const metaItems = [];
-                if (entry.author) metaItems.push(`<div class="entry-meta-item"><strong>Author:</strong>${entry.author}</div>`);
-                if (entry.prLink) metaItems.push(`<div class="entry-meta-item"><strong>PR:</strong><a href="${entry.prLink}" target="_blank">${entry.prLink}</a></div>`);
-                if (entry.figmaLink) metaItems.push(`<div class="entry-meta-item"><strong>Figma:</strong><a href="${entry.figmaLink}" target="_blank">${entry.figmaLink}</a></div>`);
-                
-                const metaHtml = metaItems.length > 0 ? `
-                    <div class="entry-meta">
-                        ${metaItems.join('')}
-                    </div>
-                ` : '';
-
-                return `
-                    <div class="entry-card">
-                        <div class="entry-header">
-                            <div>
-                                <div class="entry-title">${entry.title}</div>
-                                ${tagsHtml}
-                            </div>
-                            <div class="entry-date">${entry.date}</div>
-                        </div>
-                        <div class="entry-description">${entry.description}</div>
-                        <div class="entry-changes">
-                            <h3>Changes</h3>
-                            <ul>${changesHtml}</ul>
-                        </div>
-                        <div class="entry-decisions">
-                            <h3>Decisions</h3>
-                            <p>${entry.decisions}</p>
-                        </div>
-                        ${mermaidHtml}
-                        ${metaHtml}
-                    </div>
-                `;
-            }).join('');
-
-            // Reinitialize Mermaid for new diagrams
-            mermaid.init(undefined, container.querySelectorAll('.mermaid'));
-        }
-
-        function getDefaultEntries() {
-            return [
-                {
-                    title: "Refactored Authentication System",
-                    date: "2024-01-15",
-                    author: "John Doe",
-                    prLink: "https://github.com/org/repo/pull/123",
-                    figmaLink: "https://www.figma.com/file/abc123/auth-redesign",
-                    description: "Migrated from session-based to JWT-based authentication to improve scalability and enable stateless API design.",
-                    changes: [
-                        "Replaced session storage with JWT tokens",
-                        "Added token refresh mechanism",
-                        "Implemented secure token storage in httpOnly cookies",
-                        "Updated all API endpoints to validate JWT tokens"
-                    ],
-                    decisions: "Chose JWT over sessions because we're moving to a microservices architecture where stateless authentication is crucial. Tokens are stored in httpOnly cookies to prevent XSS attacks, and refresh tokens are rotated on each use for enhanced security.",
-                    diagram: `graph TD
-    A[User Login] --> B[Validate Credentials]
-    B --> C[Generate JWT Token]
-    C --> D[Store in httpOnly Cookie]
-    D --> E[Return Token to Client]
-    E --> F[Client Includes Token in Requests]
-    F --> G[API Validates Token]
-    G --> H{Token Valid?}
-    H -->|Yes| I[Process Request]
-    H -->|No| J[Return 401 Unauthorized]
-    I --> K[Return Response]`,
-                    tags: ["Authentication", "Security", "Backend"]
-                },
-                {
-                    title: "Database Query Optimization",
-                    date: "2024-01-20",
-                    author: "Jane Smith",
-                    prLink: "https://github.com/org/repo/pull/124",
-                    figmaLink: "https://www.figma.com/file/ghi789/database-optimization",
-                    description: "Optimized slow database queries by adding indexes and refactoring complex joins.",
-                    changes: [
-                        "Added composite indexes on frequently queried columns",
-                        "Refactored N+1 query patterns to use batch loading",
-                        "Implemented query result caching for read-heavy endpoints",
-                        "Added database query monitoring and alerting"
-                    ],
-                    decisions: "After profiling, we identified that 80% of slow queries were due to missing indexes on foreign keys and frequently filtered columns. We added composite indexes strategically to balance query performance with write performance. Caching was implemented only for data that changes infrequently.",
-                    diagram: `graph LR
-    A[API Request] --> B{Cache Hit?}
-    B -->|Yes| C[Return Cached Data]
-    B -->|No| D[Query Database]
-    D --> E[Check Indexes]
-    E --> F[Execute Optimized Query]
-    F --> G[Store in Cache]
-    G --> H[Return Data]
-    C --> H`,
-                    tags: ["Database", "Performance", "Backend"]
-                },
-                {
-                    title: "Frontend State Management Migration",
-                    date: "2024-01-25",
-                    author: "Alex Johnson",
-                    prLink: "https://github.com/org/repo/pull/125",
-                    figmaLink: "https://www.figma.com/file/def456/state-management",
-                    description: "Migrated from Redux to Zustand for simpler state management and better TypeScript support.",
-                    changes: [
-                        "Replaced Redux store with Zustand stores",
-                        "Removed Redux boilerplate code",
-                        "Updated all components to use new state hooks",
-                        "Improved TypeScript type inference"
-                    ],
-                    decisions: "Zustand was chosen because it provides 90% of Redux functionality with 10% of the boilerplate. Our state management needs are relatively simple, and Zustand's TypeScript support is superior. This reduces bundle size and improves developer experience.",
-                    diagram: `graph TD
-    A[Component] --> B[Zustand Store]
-    B --> C[State Update]
-    C --> D[Notify Subscribers]
-    D --> E[Component Re-renders]
-    B --> F[Actions]
-    F --> C`,
-                    tags: ["Frontend", "State Management", "TypeScript"]
-                },
-                {
-                    title: "CI/CD Pipeline Enhancement",
-                    date: "2024-02-01",
-                    author: "Sarah Williams",
-                    prLink: "https://github.com/org/repo/pull/126",
-                    figmaLink: "https://www.figma.com/file/jkl012/cicd-pipeline",
-                    description: "Enhanced CI/CD pipeline with parallel test execution and automated deployment to staging.",
-                    changes: [
-                        "Configured parallel test execution in GitHub Actions",
-                        "Added automated deployment to staging environment",
-                        "Implemented deployment rollback mechanism",
-                        "Added Slack notifications for build status"
-                    ],
-                    decisions: "Parallel test execution reduces CI time from 15 minutes to 5 minutes. Automated staging deployments allow QA to test features immediately after merge. Rollback mechanism ensures we can quickly revert problematic deployments without manual intervention.",
-                    diagram: `graph LR
-    A[Git Push] --> B[GitHub Actions Triggered]
-    B --> C[Run Tests in Parallel]
-    C --> D{Tests Pass?}
-    D -->|No| E[Notify Team]
-    D -->|Yes| F[Build Application]
-    F --> G[Deploy to Staging]
-    G --> H[Run Smoke Tests]
-    H --> I{Smoke Tests Pass?}
-    I -->|No| J[Rollback]
-    I -->|Yes| K[Notify Team]
-    E --> L[End]
-    J --> L
-    K --> L`,
-                    tags: ["DevOps", "CI/CD", "Automation"]
-                }
-            ];
-        }
-
-        // Function to update entries (called when new changes are added)
-        window.updateTechChanges = function(newEntry) {
-            const storageKey = currentTrackerFile ? `techChanges_${currentTrackerFile}` : 'techChanges';
-            const stored = localStorage.getItem(storageKey);
-            const entries = stored ? JSON.parse(stored) : [];
-            entries.unshift(newEntry); // Add to beginning
-            localStorage.setItem(storageKey, JSON.stringify(entries));
-            displayEntries(entries);
-        };
     </script>
 </body>
 </html>
