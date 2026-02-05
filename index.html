@@ -413,12 +413,15 @@
         };
 
 
-        // Check if user is already logged in
-        if (localStorage.getItem('isAuthenticated') === 'true') {
-            showMainContainer();
-        }
+        // Load files immediately on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            // Skip login, show files directly
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            loadFileBrowser();
+        });
 
-        // Login form handler
+        // Login form handler (optional - keeping for backward compatibility)
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const username = document.getElementById('username').value;
@@ -426,7 +429,8 @@
 
             if (username === CREDENTIALS.username && password === CREDENTIALS.password) {
                 localStorage.setItem('isAuthenticated', 'true');
-                showMainContainer();
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'block';
                 loadFileBrowser();
             } else {
                 document.getElementById('errorMessage').style.display = 'block';
@@ -436,15 +440,12 @@
             }
         });
 
-        function showMainContainer() {
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('mainContainer').style.display = 'block';
-            loadFileBrowser();
-        }
-
         function loadFileBrowser() {
             fetch('files.json')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error('files.json not found');
+                    return response.json();
+                })
                 .then(files => {
                     if (files && files.length > 0) {
                         displayFileList(files);
@@ -454,7 +455,10 @@
                 })
                 .catch(error => {
                     console.error('Error loading files.json:', error);
-                    showEmptyState();
+                    // Try to show tech-changes-tracker.html if it exists
+                    displayFileList([
+                        { filename: 'tech-changes-tracker.html', title: 'Tech Changes Tracker', description: 'Tech changes tracker' }
+                    ]);
                 });
         }
 
@@ -465,7 +469,7 @@
                     <p>No HTML tracker files found.</p>
                     <p style="margin-top: 16px; font-size: 12px; color: #999;">
                         Add HTML files to the directory and run:<br>
-                        <code style="background: #f5f5f5; padding: 4px 8px; border-radius: 4px;">node auto-update-files.js</code>
+                        <code style="background: #f5f5f5; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 8px;">node auto-update-files.js</code>
                     </p>
                 </div>
             `;
@@ -484,10 +488,8 @@
 
         function logout() {
             localStorage.removeItem('isAuthenticated');
-            document.getElementById('loginContainer').style.display = 'block';
-            document.getElementById('mainContainer').style.display = 'none';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
+            // Reload page to show login again
+            window.location.reload();
         }
 
 
