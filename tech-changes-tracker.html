@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Changes Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            color: #000;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Login Screen */
+        #loginScreen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px 0;
+            border: none;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 16px;
+            background: transparent;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-bottom-color: #000;
+        }
+
+        .btn {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #333;
+        }
+
+        .error {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Main Content */
+        #mainContent {
+            display: none;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 16px;
+            background: transparent;
+            outline: none;
+        }
+
+        .search-box:focus {
+            border-bottom-color: #000;
+        }
+
+        .search-box::placeholder {
+            color: #999;
+        }
+
+        /* Entry Cards */
+        .entries-container {
+            margin-top: 30px;
+        }
+
+        .entry-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .entry-header {
+            margin-bottom: 16px;
+        }
+
+        .entry-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .entry-date {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .entry-description {
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .entry-section {
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .changes-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .changes-list li {
+            padding: 4px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .changes-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+        }
+
+        .decisions {
+            padding-left: 16px;
+            border-left: 2px solid #e0e0e0;
+            margin-left: 0;
+            color: #333;
+        }
+
+        .diagram-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            overflow-x: auto;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border: 1px solid #e0e0e0;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #fff;
+        }
+
+        .metadata {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .metadata-item {
+            margin-bottom: 8px;
+        }
+
+        .metadata-item strong {
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 8px;
+        }
+
+        .metadata-link {
+            color: #000;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+        }
+
+        .metadata-link:hover {
+            border-bottom-color: #000;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .entry-card {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <h1>Tech Changes Tracker</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <div class="error" id="loginError">Invalid credentials</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent">
+        <div class="container">
+            <div class="header">
+                <h1>Tech Changes Tracker</h1>
+                <input type="text" class="search-box" id="searchInput" placeholder="Search entries...">
+            </div>
+
+            <div class="entries-container" id="entriesContainer">
+                <!-- Entries will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+
+        // Authentication
+        const AUTH_USERNAME = 'admin';
+        const AUTH_PASSWORD = 'internal2024';
+        const STORAGE_KEY = 'techChanges';
+        const AUTH_KEY = 'techChangesAuth';
+
+        // Check if already authenticated
+        if (localStorage.getItem(AUTH_KEY) === 'authenticated') {
+            showMainContent();
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (username === AUTH_USERNAME && password === AUTH_PASSWORD) {
+                localStorage.setItem(AUTH_KEY, 'authenticated');
+                errorDiv.style.display = 'none';
+                showMainContent();
+            } else {
+                errorDiv.style.display = 'block';
+            }
+        });
+
+        function showMainContent() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            loadEntries();
+        }
+
+        // Data Management
+        function getEntries() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            return getDefaultEntries();
+        }
+
+        function saveEntries(entries) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        }
+
+        function getDefaultEntries() {
+            return [
+                {
+                    title: "Refactored Authentication System",
+                    date: "2024-01-15",
+                    author: "Sarah Chen",
+                    prLink: "https://github.com/company/product/pull/342",
+                    figmaLink: "https://www.figma.com/file/abc123def456/Auth-Redesign",
+                    description: "Completely refactored the authentication system to support OAuth2 and improve security posture. Migrated from session-based to token-based authentication.",
+                    changes: [
+                        "Replaced session cookies with JWT tokens",
+                        "Added OAuth2 provider support (Google, GitHub)",
+                        "Implemented refresh token rotation",
+                        "Added rate limiting for login attempts",
+                        "Migrated password hashing to bcrypt with increased rounds"
+                    ],
+                    decisions: "We chose JWT over sessions for better scalability and statelessness. OAuth2 was added to reduce password management burden and improve user experience. Refresh token rotation prevents token reuse attacks. Rate limiting protects against brute force attempts.",
+                    diagram: "graph TD\n    A[User Login] --> B{Authentication Method}\n    B -->|OAuth2| C[OAuth Provider]\n    B -->|Email/Password| D[Verify Credentials]\n    C --> E[Generate JWT]\n    D --> E\n    E --> F[Return Access Token]\n    F --> G[Client Stores Token]\n    G --> H[API Requests with Token]",
+                    tags: ["Security", "Authentication", "Backend"]
+                },
+                {
+                    title: "Implemented Real-time Notifications",
+                    date: "2024-01-22",
+                    author: "Michael Rodriguez",
+                    prLink: "https://github.com/company/product/pull/378",
+                    figmaLink: "https://www.figma.com/file/xyz789ghi012/Notification-System",
+                    description: "Built a real-time notification system using WebSockets to deliver instant updates to users without polling.",
+                    changes: [
+                        "Set up WebSocket server using Socket.io",
+                        "Created notification queue system",
+                        "Implemented notification preferences",
+                        "Added notification history storage",
+                        "Built notification center UI component"
+                    ],
+                    decisions: "WebSockets were chosen over Server-Sent Events (SSE) for bidirectional communication needs. Socket.io provides automatic fallbacks and reconnection logic. We implemented a queue system to handle high-volume scenarios and ensure delivery. Notification preferences allow users to control what they receive.",
+                    diagram: "graph LR\n    A[Client] -->|WebSocket| B[Socket.io Server]\n    B --> C[Notification Queue]\n    C --> D[Event Processor]\n    D --> E[User Preferences Filter]\n    E --> B\n    B -->|Push| A\n    F[Database] --> C",
+                    tags: ["Frontend", "Real-time", "WebSockets"]
+                },
+                {
+                    title: "Database Migration to PostgreSQL",
+                    date: "2024-02-05",
+                    author: "Emily Watson",
+                    prLink: "https://github.com/company/product/pull/401",
+                    figmaLink: null,
+                    description: "Migrated the entire database from MySQL to PostgreSQL to take advantage of advanced features and better JSON support.",
+                    changes: [
+                        "Set up PostgreSQL 15 cluster",
+                        "Migrated all tables and data",
+                        "Updated all ORM queries",
+                        "Implemented connection pooling",
+                        "Added database backup automation",
+                        "Updated deployment scripts"
+                    ],
+                    decisions: "PostgreSQL was chosen for its superior JSON support, which is critical for our flexible schema needs. The advanced indexing capabilities (GIN, GiST) will improve query performance for our search features. The migration was done incrementally using a dual-write pattern to ensure zero downtime. Connection pooling was implemented to handle increased load efficiently.",
+                    diagram: "graph TD\n    A[Application] --> B[Connection Pool]\n    B --> C[PostgreSQL Primary]\n    C --> D[Read Replicas]\n    C --> E[Backup System]\n    F[MySQL Legacy] -->|Data Sync| C\n    G[Migration Scripts] --> C",
+                    tags: ["Database", "Backend", "Infrastructure"]
+                },
+                {
+                    title: "Redesigned Dashboard UI",
+                    date: "2024-02-12",
+                    author: "David Kim",
+                    prLink: "https://github.com/company/product/pull/415",
+                    figmaLink: "https://www.figma.com/file/mno345pqr678/Dashboard-Redesign",
+                    description: "Complete redesign of the user dashboard with improved information architecture and modern, accessible UI components.",
+                    changes: [
+                        "Redesigned layout with grid system",
+                        "Added customizable widget system",
+                        "Implemented dark mode support",
+                        "Improved accessibility (WCAG 2.1 AA)",
+                        "Optimized for mobile responsiveness",
+                        "Added keyboard navigation"
+                    ],
+                    decisions: "The grid system provides flexibility while maintaining consistency. Widget customization was prioritized based on user feedback showing 60% of users wanted personalized dashboards. Dark mode was implemented using CSS custom properties for easy theme switching. Accessibility improvements ensure compliance and better experience for all users. Mobile-first approach ensures the dashboard works well on all devices.",
+                    diagram: "graph TD\n    A[Dashboard Container] --> B[Header Widget]\n    A --> C[Grid Layout]\n    C --> D[Widget 1]\n    C --> E[Widget 2]\n    C --> F[Widget 3]\n    C --> G[Widget N]\n    H[Theme System] --> A\n    I[User Preferences] --> C",
+                    tags: ["Frontend", "UI/UX", "Accessibility"]
+                }
+            ];
+        }
+
+        // Initialize with default entries if empty
+        if (!localStorage.getItem(STORAGE_KEY)) {
+            saveEntries(getDefaultEntries());
+        }
+
+        // Display Functions
+        function loadEntries() {
+            const entries = getEntries();
+            renderEntries(entries);
+        }
+
+        function renderEntries(entries) {
+            const container = document.getElementById('entriesContainer');
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="no-results">No entries found</div>';
+                return;
+            }
+
+            container.innerHTML = entries.map((entry, index) => {
+                const diagramId = `diagram-${index}`;
+                const hasDiagram = entry.diagram && entry.diagram.trim();
+                
+                return `
+                    <div class="entry-card">
+                        <div class="entry-header">
+                            <div class="entry-title">${escapeHtml(entry.title)}</div>
+                            <div class="entry-date">${escapeHtml(entry.date)}</div>
+                        </div>
+                        
+                        <div class="entry-description">${escapeHtml(entry.description)}</div>
+                        
+                        ${entry.changes && entry.changes.length > 0 ? `
+                            <div class="entry-section">
+                                <div class="section-label">Changes</div>
+                                <ul class="changes-list">
+                                    ${entry.changes.map(change => `<li>${escapeHtml(change)}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${entry.decisions ? `
+                            <div class="entry-section">
+                                <div class="section-label">Decisions</div>
+                                <div class="decisions">${escapeHtml(entry.decisions)}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${hasDiagram ? `
+                            <div class="entry-section">
+                                <div class="section-label">Architecture Diagram</div>
+                                <div class="diagram-container">
+                                    <div class="mermaid" id="${diagramId}">${escapeHtml(entry.diagram)}</div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${entry.tags && entry.tags.length > 0 ? `
+                            <div class="tags-container">
+                                ${entry.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="metadata">
+                            ${entry.author ? `<div class="metadata-item"><strong>Author:</strong> ${escapeHtml(entry.author)}</div>` : ''}
+                            ${entry.prLink ? `<div class="metadata-item"><strong>PR:</strong> <a href="${escapeHtml(entry.prLink)}" target="_blank" class="metadata-link">${escapeHtml(entry.prLink)}</a></div>` : ''}
+                            ${entry.figmaLink ? `<div class="metadata-item"><strong>Figma:</strong> <a href="${escapeHtml(entry.figmaLink)}" target="_blank" class="metadata-link">${escapeHtml(entry.figmaLink)}</a></div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Reinitialize Mermaid for new diagrams
+            if (hasDiagram) {
+                mermaid.run();
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Search Functionality
+        function searchEntries(query) {
+            const entries = getEntries();
+            if (!query.trim()) {
+                renderEntries(entries);
+                return;
+            }
+
+            const lowerQuery = query.toLowerCase();
+            const filtered = entries.filter(entry => {
+                const searchableText = [
+                    entry.title,
+                    entry.date,
+                    entry.description,
+                    entry.author || '',
+                    entry.prLink || '',
+                    entry.figmaLink || '',
+                    entry.decisions || '',
+                    ...(entry.changes || []),
+                    ...(entry.tags || [])
+                ].join(' ').toLowerCase();
+
+                return searchableText.includes(lowerQuery);
+            });
+
+            renderEntries(filtered);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchEntries(e.target.value);
+        });
+
+        // Public API Function
+        window.updateTechChanges = function(newEntry) {
+            if (!newEntry || typeof newEntry !== 'object') {
+                console.error('Invalid entry provided');
+                return;
+            }
+
+            // Validate required fields
+            if (!newEntry.title || !newEntry.date) {
+                console.error('Entry must have title and date');
+                return;
+            }
+
+            const entries = getEntries();
+            entries.unshift(newEntry); // Add to beginning
+            saveEntries(entries);
+            loadEntries();
+        };
+
+        // Load entries on page load
+        if (localStorage.getItem(AUTH_KEY) === 'authenticated') {
+            loadEntries();
+        }
+    </script>
+</body>
+</html>
