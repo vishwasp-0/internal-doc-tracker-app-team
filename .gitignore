@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Optional: Keep example files but ignore local test data
+# Uncomment if you want to ignore these
+# example-entry.json
+# update-entry.js

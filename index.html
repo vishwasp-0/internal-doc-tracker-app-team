@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Changes Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 0;
+            color: #1a1a1a;
+        }
+
+        .login-container {
+            max-width: 360px;
+            margin: 120px auto;
+            background: white;
+            padding: 48px 40px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .login-container h1 {
+            text-align: left;
+            color: #1a1a1a;
+            margin-bottom: 32px;
+            font-size: 24px;
+            font-weight: 400;
+            letter-spacing: -0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 13px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 0;
+            border: none;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 15px;
+            transition: border-color 0.2s;
+            background: transparent;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-bottom-color: #1a1a1a;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 0;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn:hover {
+            background: #333;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            text-align: left;
+            margin-top: 16px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            display: none;
+        }
+
+        .header {
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 24px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .header h1 {
+            color: #1a1a1a;
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: -0.3px;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 320px;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 8px 0;
+            border: none;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            background: transparent;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-bottom-color: #1a1a1a;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: transparent;
+            color: #666;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 400;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            border-color: #1a1a1a;
+            color: #1a1a1a;
+        }
+
+        .entries-container {
+            display: grid;
+            gap: 32px;
+        }
+
+        .entry-card {
+            background: white;
+            padding: 32px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .entry-title {
+            font-size: 18px;
+            color: #1a1a1a;
+            font-weight: 400;
+            letter-spacing: -0.2px;
+        }
+
+        .entry-date {
+            color: #999;
+            font-size: 12px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .entry-meta {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .entry-meta-item {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .entry-meta-item strong {
+            color: #999;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 8px;
+        }
+
+        .entry-meta-item a {
+            color: #1a1a1a;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .entry-meta-item a:hover {
+            border-bottom-color: #1a1a1a;
+        }
+
+        .entry-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .entry-changes {
+            margin-bottom: 24px;
+        }
+
+        .entry-changes h3 {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 12px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .entry-changes ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .entry-changes li {
+            padding: 6px 0;
+            padding-left: 16px;
+            position: relative;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .entry-changes li:before {
+            content: "—";
+            position: absolute;
+            left: 0;
+            color: #999;
+        }
+
+        .entry-decisions {
+            margin-bottom: 24px;
+        }
+
+        .entry-decisions h3 {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 12px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .entry-decisions p {
+            color: #666;
+            line-height: 1.6;
+            padding: 16px;
+            border-left: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        .mermaid-container {
+            margin-top: 24px;
+            padding: 24px;
+            border: 1px solid #e0e0e0;
+            overflow-x: auto;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: transparent;
+            color: #666;
+            border: 1px solid #e0e0e0;
+            font-size: 11px;
+            margin-right: 8px;
+            margin-top: 12px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 24px 16px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-container {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .entry-card {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginContainer">
+        <h1>Tech Changes Tracker</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="btn">Login</button>
+            <div class="error-message" id="errorMessage">Invalid credentials</div>
+        </form>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container" id="mainContainer">
+        <div class="header">
+            <h1>Tech Changes Tracker</h1>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search">
+                <span class="search-icon">⌕</span>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+        <div class="entries-container" id="entriesContainer"></div>
+    </div>
+
+    <script>
+        // Hardcoded credentials
+        const CREDENTIALS = {
+            username: 'admin',
+            password: 'internal2024'
+        };
+
+        // Initialize Mermaid
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true
+            }
+        });
+
+        // Check if user is already logged in
+        if (localStorage.getItem('isAuthenticated') === 'true') {
+            showMainContainer();
+        }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === CREDENTIALS.username && password === CREDENTIALS.password) {
+                localStorage.setItem('isAuthenticated', 'true');
+                showMainContainer();
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('errorMessage').style.display = 'none';
+                }, 3000);
+            }
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            filterEntries(e.target.value.toLowerCase());
+        });
+
+        function showMainContainer() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            loadEntries();
+        }
+
+        function logout() {
+            localStorage.removeItem('isAuthenticated');
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('mainContainer').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function loadEntries() {
+            // Load from localStorage, start with empty array if none exists
+            let entries = [];
+            const stored = localStorage.getItem('techChanges');
+            if (stored) {
+                entries = JSON.parse(stored);
+            }
+            displayEntries(entries);
+        }
+
+        function filterEntries(searchTerm) {
+            const stored = localStorage.getItem('techChanges');
+            const entries = stored ? JSON.parse(stored) : [];
+            
+            if (!searchTerm) {
+                displayEntries(entries);
+                return;
+            }
+
+            const filtered = entries.filter(entry => {
+                const searchableText = [
+                    entry.title,
+                    entry.description,
+                    entry.date,
+                    entry.author || '',
+                    entry.prLink || '',
+                    entry.figmaLink || '',
+                    ...entry.changes,
+                    entry.decisions,
+                    ...(entry.tags || [])
+                ].join(' ').toLowerCase();
+                
+                return searchableText.includes(searchTerm);
+            });
+
+            displayEntries(filtered);
+        }
+
+        function displayEntries(entries) {
+            const container = document.getElementById('entriesContainer');
+            
+            if (entries.length === 0) {
+                const searchTerm = document.getElementById('searchInput').value;
+                const message = searchTerm 
+                    ? 'No entries found matching your search.' 
+                    : 'No entries yet. Use updateTechChanges() in the console to add your first entry.';
+                container.innerHTML = `<div class="no-results">${message}</div>`;
+                return;
+            }
+
+            container.innerHTML = entries.map((entry, index) => {
+                const tagsHtml = (entry.tags || []).map(tag => 
+                    `<span class="tag">${tag}</span>`
+                ).join('');
+
+                const changesHtml = entry.changes.map(change => 
+                    `<li>${change}</li>`
+                ).join('');
+
+                const mermaidHtml = entry.diagram ? 
+                    `<div class="mermaid-container">
+                        <div class="mermaid">${entry.diagram}</div>
+                    </div>` : '';
+
+                const metaItems = [];
+                if (entry.author) metaItems.push(`<div class="entry-meta-item"><strong>Author:</strong>${entry.author}</div>`);
+                if (entry.prLink) metaItems.push(`<div class="entry-meta-item"><strong>PR:</strong><a href="${entry.prLink}" target="_blank">${entry.prLink}</a></div>`);
+                if (entry.figmaLink) metaItems.push(`<div class="entry-meta-item"><strong>Figma:</strong><a href="${entry.figmaLink}" target="_blank">${entry.figmaLink}</a></div>`);
+                
+                const metaHtml = metaItems.length > 0 ? `
+                    <div class="entry-meta">
+                        ${metaItems.join('')}
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="entry-card">
+                        <div class="entry-header">
+                            <div>
+                                <div class="entry-title">${entry.title}</div>
+                                ${tagsHtml}
+                            </div>
+                            <div class="entry-date">${entry.date}</div>
+                        </div>
+                        <div class="entry-description">${entry.description}</div>
+                        <div class="entry-changes">
+                            <h3>Changes</h3>
+                            <ul>${changesHtml}</ul>
+                        </div>
+                        <div class="entry-decisions">
+                            <h3>Decisions</h3>
+                            <p>${entry.decisions}</p>
+                        </div>
+                        ${mermaidHtml}
+                        ${metaHtml}
+                    </div>
+                `;
+            }).join('');
+
+            // Reinitialize Mermaid for new diagrams
+            mermaid.init(undefined, container.querySelectorAll('.mermaid'));
+        }
+
+        function getDefaultEntries() {
+            return [
+                {
+                    title: "Refactored Authentication System",
+                    date: "2024-01-15",
+                    author: "John Doe",
+                    prLink: "https://github.com/org/repo/pull/123",
+                    figmaLink: "https://www.figma.com/file/abc123/auth-redesign",
+                    description: "Migrated from session-based to JWT-based authentication to improve scalability and enable stateless API design.",
+                    changes: [
+                        "Replaced session storage with JWT tokens",
+                        "Added token refresh mechanism",
+                        "Implemented secure token storage in httpOnly cookies",
+                        "Updated all API endpoints to validate JWT tokens"
+                    ],
+                    decisions: "Chose JWT over sessions because we're moving to a microservices architecture where stateless authentication is crucial. Tokens are stored in httpOnly cookies to prevent XSS attacks, and refresh tokens are rotated on each use for enhanced security.",
+                    diagram: `graph TD
+    A[User Login] --> B[Validate Credentials]
+    B --> C[Generate JWT Token]
+    C --> D[Store in httpOnly Cookie]
+    D --> E[Return Token to Client]
+    E --> F[Client Includes Token in Requests]
+    F --> G[API Validates Token]
+    G --> H{Token Valid?}
+    H -->|Yes| I[Process Request]
+    H -->|No| J[Return 401 Unauthorized]
+    I --> K[Return Response]`,
+                    tags: ["Authentication", "Security", "Backend"]
+                },
+                {
+                    title: "Database Query Optimization",
+                    date: "2024-01-20",
+                    author: "Jane Smith",
+                    prLink: "https://github.com/org/repo/pull/124",
+                    figmaLink: "https://www.figma.com/file/ghi789/database-optimization",
+                    description: "Optimized slow database queries by adding indexes and refactoring complex joins.",
+                    changes: [
+                        "Added composite indexes on frequently queried columns",
+                        "Refactored N+1 query patterns to use batch loading",
+                        "Implemented query result caching for read-heavy endpoints",
+                        "Added database query monitoring and alerting"
+                    ],
+                    decisions: "After profiling, we identified that 80% of slow queries were due to missing indexes on foreign keys and frequently filtered columns. We added composite indexes strategically to balance query performance with write performance. Caching was implemented only for data that changes infrequently.",
+                    diagram: `graph LR
+    A[API Request] --> B{Cache Hit?}
+    B -->|Yes| C[Return Cached Data]
+    B -->|No| D[Query Database]
+    D --> E[Check Indexes]
+    E --> F[Execute Optimized Query]
+    F --> G[Store in Cache]
+    G --> H[Return Data]
+    C --> H`,
+                    tags: ["Database", "Performance", "Backend"]
+                },
+                {
+                    title: "Frontend State Management Migration",
+                    date: "2024-01-25",
+                    author: "Alex Johnson",
+                    prLink: "https://github.com/org/repo/pull/125",
+                    figmaLink: "https://www.figma.com/file/def456/state-management",
+                    description: "Migrated from Redux to Zustand for simpler state management and better TypeScript support.",
+                    changes: [
+                        "Replaced Redux store with Zustand stores",
+                        "Removed Redux boilerplate code",
+                        "Updated all components to use new state hooks",
+                        "Improved TypeScript type inference"
+                    ],
+                    decisions: "Zustand was chosen because it provides 90% of Redux functionality with 10% of the boilerplate. Our state management needs are relatively simple, and Zustand's TypeScript support is superior. This reduces bundle size and improves developer experience.",
+                    diagram: `graph TD
+    A[Component] --> B[Zustand Store]
+    B --> C[State Update]
+    C --> D[Notify Subscribers]
+    D --> E[Component Re-renders]
+    B --> F[Actions]
+    F --> C`,
+                    tags: ["Frontend", "State Management", "TypeScript"]
+                },
+                {
+                    title: "CI/CD Pipeline Enhancement",
+                    date: "2024-02-01",
+                    author: "Sarah Williams",
+                    prLink: "https://github.com/org/repo/pull/126",
+                    figmaLink: "https://www.figma.com/file/jkl012/cicd-pipeline",
+                    description: "Enhanced CI/CD pipeline with parallel test execution and automated deployment to staging.",
+                    changes: [
+                        "Configured parallel test execution in GitHub Actions",
+                        "Added automated deployment to staging environment",
+                        "Implemented deployment rollback mechanism",
+                        "Added Slack notifications for build status"
+                    ],
+                    decisions: "Parallel test execution reduces CI time from 15 minutes to 5 minutes. Automated staging deployments allow QA to test features immediately after merge. Rollback mechanism ensures we can quickly revert problematic deployments without manual intervention.",
+                    diagram: `graph LR
+    A[Git Push] --> B[GitHub Actions Triggered]
+    B --> C[Run Tests in Parallel]
+    C --> D{Tests Pass?}
+    D -->|No| E[Notify Team]
+    D -->|Yes| F[Build Application]
+    F --> G[Deploy to Staging]
+    G --> H[Run Smoke Tests]
+    H --> I{Smoke Tests Pass?}
+    I -->|No| J[Rollback]
+    I -->|Yes| K[Notify Team]
+    E --> L[End]
+    J --> L
+    K --> L`,
+                    tags: ["DevOps", "CI/CD", "Automation"]
+                }
+            ];
+        }
+
+        // Function to update entries (called when new changes are added)
+        window.updateTechChanges = function(newEntry) {
+            const stored = localStorage.getItem('techChanges');
+            const entries = stored ? JSON.parse(stored) : [];
+            entries.unshift(newEntry); // Add to beginning
+            localStorage.setItem('techChanges', JSON.stringify(entries));
+            displayEntries(entries);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+    "title": "API Rate Limiting Implementation",
+    "date": "2024-02-05",
+    "author": "Your Name",
+    "prLink": "https://github.com/org/repo/pull/123",
+    "figmaLink": "https://www.figma.com/file/abc123/rate-limiting-design",
+    "description": "Implemented rate limiting for API endpoints to prevent abuse and ensure fair usage across all clients.",
+    "changes": [
+        "Added rate limiting middleware using express-rate-limit",
+        "Configured different limits for authenticated vs anonymous users",
+        "Implemented Redis-based rate limiting for distributed systems",
+        "Added rate limit headers to all API responses",
+        "Created monitoring dashboard for rate limit metrics"
+    ],
+    "decisions": "Chose express-rate-limit with Redis store because we need distributed rate limiting across multiple server instances. Authenticated users get 1000 requests/hour while anonymous users get 100 requests/hour. We use sliding window algorithm for smoother rate limiting. Headers are included so clients can implement proper retry logic.",
+    "diagram": "graph TD\n    A[API Request] --> B{Rate Limit Check}\n    B -->|Within Limit| C[Process Request]\n    B -->|Exceeded| D[Return 429 Too Many Requests]\n    C --> E[Increment Counter]\n    E --> F[Return Response]\n    D --> G[Include Retry-After Header]",
+    "tags": ["API", "Security", "Backend", "Redis"]
+}
