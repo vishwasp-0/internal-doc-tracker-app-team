@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tech Changes Tracker - File Browser</title>
+    <title>Tech Changes Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -15,149 +16,25 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: #f5f5f5;
             min-height: 100vh;
-            padding: 0;
+            padding: 40px 24px;
             color: #1a1a1a;
         }
 
-        .login-container {
-            max-width: 360px;
-            margin: 120px auto;
-            background: white;
-            padding: 48px 40px;
-            border: 1px solid #e0e0e0;
-        }
-
-        .login-container h1 {
-            text-align: left;
-            color: #1a1a1a;
-            margin-bottom: 32px;
-            font-size: 24px;
-            font-weight: 400;
-            letter-spacing: -0.5px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #666;
-            font-size: 13px;
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px 0;
-            border: none;
-            border-bottom: 1px solid #e0e0e0;
-            font-size: 15px;
-            transition: border-color 0.2s;
-            background: transparent;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-bottom-color: #1a1a1a;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px 0;
-            background: #1a1a1a;
-            color: white;
-            border: none;
-            font-size: 14px;
-            font-weight: 400;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 8px;
-        }
-
-        .btn:hover {
-            background: #333;
-        }
-
-        .error-message {
-            color: #d32f2f;
-            text-align: left;
-            margin-top: 16px;
-            font-size: 13px;
-            display: none;
-        }
-
-        .main-container {
+        .container {
             max-width: 900px;
             margin: 0 auto;
-            padding: 40px 24px;
-            display: none;
         }
 
         .header {
             border-bottom: 1px solid #e0e0e0;
             padding-bottom: 24px;
             margin-bottom: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 24px;
         }
 
         .header h1 {
-            color: #1a1a1a;
             font-size: 20px;
             font-weight: 400;
             letter-spacing: -0.3px;
-        }
-
-        .search-container {
-            flex: 1;
-            max-width: 320px;
-            position: relative;
-        }
-
-        .search-container input {
-            width: 100%;
-            padding: 8px 0;
-            border: none;
-            border-bottom: 1px solid #e0e0e0;
-            font-size: 14px;
-            background: transparent;
-        }
-
-        .search-container input:focus {
-            outline: none;
-            border-bottom-color: #1a1a1a;
-        }
-
-        .search-icon {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-            font-size: 14px;
-        }
-
-        .logout-btn {
-            padding: 8px 16px;
-            background: transparent;
-            color: #666;
-            border: 1px solid #e0e0e0;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 400;
-            transition: all 0.2s;
-        }
-
-        .logout-btn:hover {
-            border-color: #1a1a1a;
-            color: #1a1a1a;
         }
 
         .entries-container {
@@ -193,39 +70,6 @@
             font-weight: 400;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        .entry-meta {
-            display: flex;
-            gap: 16px;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #e0e0e0;
-            flex-wrap: wrap;
-        }
-
-        .entry-meta-item {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .entry-meta-item strong {
-            color: #999;
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-right: 8px;
-        }
-
-        .entry-meta-item a {
-            color: #1a1a1a;
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: border-color 0.2s;
-        }
-
-        .entry-meta-item a:hover {
-            border-bottom-color: #1a1a1a;
         }
 
         .entry-description {
@@ -304,45 +148,6 @@
             font-size: 14px;
         }
 
-        .file-list {
-            display: grid;
-            gap: 16px;
-        }
-
-        .file-item {
-            background: white;
-            border: 1px solid #e0e0e0;
-            padding: 24px;
-            text-decoration: none;
-            display: block;
-            transition: border-color 0.2s;
-        }
-
-        .file-item:hover {
-            border-color: #1a1a1a;
-        }
-
-        .file-item-title {
-            font-size: 16px;
-            color: #1a1a1a;
-            margin-bottom: 8px;
-            font-weight: 400;
-        }
-
-        .file-item-filename {
-            font-size: 12px;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .file-item-description {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.5;
-        }
-
         .tag {
             display: inline-block;
             padding: 2px 8px;
@@ -357,19 +162,61 @@
             letter-spacing: 0.5px;
         }
 
+        .entry-meta {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .entry-meta-item {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .entry-meta-item strong {
+            color: #999;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 8px;
+        }
+
+        .entry-meta-item a {
+            color: #1a1a1a;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .entry-meta-item a:hover {
+            border-bottom-color: #1a1a1a;
+        }
+
+        .search-container {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 8px 0;
+            border: none;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            background: transparent;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-bottom-color: #1a1a1a;
+        }
+
         @media (max-width: 768px) {
-            .main-container {
+            body {
                 padding: 24px 16px;
-            }
-
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .search-container {
-                max-width: 100%;
-                width: 100%;
             }
 
             .entry-card {
@@ -379,120 +226,142 @@
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div class="login-container" id="loginContainer">
-        <h1>Tech Changes Tracker</h1>
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" required>
-            </div>
-            <button type="submit" class="btn">Login</button>
-            <div class="error-message" id="errorMessage">Invalid credentials</div>
-        </form>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-container" id="mainContainer">
+    <div class="container">
         <div class="header">
-            <h1>Tech Changes Trackers</h1>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+            <h1>Tech Changes Tracker</h1>
         </div>
-        <div class="file-list" id="fileList"></div>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search">
+        </div>
+        
+        <div class="entries-container" id="entriesContainer"></div>
     </div>
 
     <script>
-        // Hardcoded credentials
-        const CREDENTIALS = {
-            username: 'admin',
-            password: 'internal2024'
-        };
-
-
-        // Load files immediately on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            // Skip login, show files directly
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('mainContainer').style.display = 'block';
-            loadFileBrowser();
-        });
-
-        // Login form handler (optional - keeping for backward compatibility)
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (username === CREDENTIALS.username && password === CREDENTIALS.password) {
-                localStorage.setItem('isAuthenticated', 'true');
-                document.getElementById('loginContainer').style.display = 'none';
-                document.getElementById('mainContainer').style.display = 'block';
-                loadFileBrowser();
-            } else {
-                document.getElementById('errorMessage').style.display = 'block';
-                setTimeout(() => {
-                    document.getElementById('errorMessage').style.display = 'none';
-                }, 3000);
+        // Initialize Mermaid
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'neutral',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true
             }
         });
 
-        function loadFileBrowser() {
-            fetch('files.json')
-                .then(response => {
-                    if (!response.ok) throw new Error('files.json not found');
-                    return response.json();
-                })
-                .then(files => {
-                    if (files && files.length > 0) {
-                        displayFileList(files);
-                    } else {
-                        showEmptyState();
-                    }
+        let allEntries = [];
+
+        // Load data from JSON file
+        function loadData() {
+            fetch('data.json')
+                .then(response => response.json())
+                .then(data => {
+                    allEntries = data.entries || [];
+                    // Sort by date (newest first)
+                    allEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    displayEntries(allEntries);
                 })
                 .catch(error => {
-                    console.error('Error loading files.json:', error);
-                    // Try to show tech-changes-tracker.html if it exists
-                    displayFileList([
-                        { filename: 'tech-changes-tracker.html', title: 'Tech Changes Tracker', description: 'Tech changes tracker' }
-                    ]);
+                    console.error('Error loading data.json:', error);
+                    document.getElementById('entriesContainer').innerHTML = 
+                        '<div class="no-results">Error loading data. Make sure data.json exists.</div>';
                 });
         }
 
-        function showEmptyState() {
-            const fileList = document.getElementById('fileList');
-            fileList.innerHTML = `
-                <div class="no-results">
-                    <p>No HTML tracker files found.</p>
-                    <p style="margin-top: 16px; font-size: 12px; color: #999;">
-                        Add HTML files to the directory and run:<br>
-                        <code style="background: #f5f5f5; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 8px;">node auto-update-files.js</code>
-                    </p>
-                </div>
-            `;
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            if (!searchTerm) {
+                displayEntries(allEntries);
+                return;
+            }
+
+            const filtered = allEntries.filter(entry => {
+                const searchableText = [
+                    entry.title,
+                    entry.description,
+                    entry.date,
+                    entry.author || '',
+                    entry.prLink || '',
+                    entry.figmaLink || '',
+                    ...(entry.changes || []),
+                    entry.decisions || '',
+                    ...(entry.tags || [])
+                ].join(' ').toLowerCase();
+                
+                return searchableText.includes(searchTerm);
+            });
+
+            displayEntries(filtered);
+        });
+
+        function displayEntries(entries) {
+            const container = document.getElementById('entriesContainer');
+            
+            if (entries.length === 0) {
+                const searchTerm = document.getElementById('searchInput').value;
+                const message = searchTerm 
+                    ? 'No entries found matching your search.' 
+                    : 'No entries yet.';
+                container.innerHTML = `<div class="no-results">${message}</div>`;
+                return;
+            }
+
+            container.innerHTML = entries.map((entry, index) => {
+                const tagsHtml = (entry.tags || []).map(tag => 
+                    `<span class="tag">${tag}</span>`
+                ).join('');
+
+                const changesHtml = (entry.changes || []).map(change => 
+                    `<li>${change}</li>`
+                ).join('');
+
+                const mermaidHtml = entry.diagram ? 
+                    `<div class="mermaid-container">
+                        <div class="mermaid">${entry.diagram}</div>
+                    </div>` : '';
+
+                const metaItems = [];
+                if (entry.author) metaItems.push(`<div class="entry-meta-item"><strong>Author:</strong>${entry.author}</div>`);
+                if (entry.prLink) metaItems.push(`<div class="entry-meta-item"><strong>PR:</strong><a href="${entry.prLink}" target="_blank">${entry.prLink}</a></div>`);
+                if (entry.figmaLink) metaItems.push(`<div class="entry-meta-item"><strong>Figma:</strong><a href="${entry.figmaLink}" target="_blank">${entry.figmaLink}</a></div>`);
+                
+                const metaHtml = metaItems.length > 0 ? `
+                    <div class="entry-meta">
+                        ${metaItems.join('')}
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="entry-card">
+                        <div class="entry-header">
+                            <div>
+                                <div class="entry-title">${entry.title}</div>
+                                ${tagsHtml}
+                            </div>
+                            <div class="entry-date">${entry.date}</div>
+                        </div>
+                        <div class="entry-description">${entry.description}</div>
+                        ${changesHtml ? `<div class="entry-changes">
+                            <h3>Changes</h3>
+                            <ul>${changesHtml}</ul>
+                        </div>` : ''}
+                        ${entry.decisions ? `<div class="entry-decisions">
+                            <h3>Decisions</h3>
+                            <p>${entry.decisions}</p>
+                        </div>` : ''}
+                        ${mermaidHtml}
+                        ${metaHtml}
+                    </div>
+                `;
+            }).join('');
+
+            // Reinitialize Mermaid for new diagrams
+            mermaid.init(undefined, container.querySelectorAll('.mermaid'));
         }
 
-        function displayFileList(files) {
-            const fileList = document.getElementById('fileList');
-            fileList.innerHTML = files.map(file => `
-                <a href="${file.filename}" class="file-item">
-                    <div class="file-item-title">${file.title}</div>
-                    <div class="file-item-filename">${file.filename}</div>
-                    <div class="file-item-description">${file.description || ''}</div>
-                </a>
-            `).join('');
-        }
-
-        function logout() {
-            localStorage.removeItem('isAuthenticated');
-            // Reload page to show login again
-            window.location.reload();
-        }
-
-
+        // Load data on page load
+        loadData();
     </script>
 </body>
 </html>
