@@ -305,6 +305,77 @@
             font-size: 14px;
         }
 
+        .file-browser {
+            display: none;
+        }
+
+        .file-browser.active {
+            display: block;
+        }
+
+        #trackerView {
+            display: none;
+        }
+
+        #trackerView.active {
+            display: block;
+        }
+
+        .file-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .file-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 24px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .file-item:hover {
+            border-color: #1a1a1a;
+        }
+
+        .file-item-title {
+            font-size: 16px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        .file-item-filename {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .file-item-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .back-btn {
+            padding: 8px 16px;
+            background: transparent;
+            color: #666;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 400;
+            transition: all 0.2s;
+            margin-bottom: 24px;
+        }
+
+        .back-btn:hover {
+            border-color: #1a1a1a;
+            color: #1a1a1a;
+        }
+
         .tag {
             display: inline-block;
             padding: 2px 8px;
@@ -360,15 +431,28 @@
 
     <!-- Main Content -->
     <div class="main-container" id="mainContainer">
-        <div class="header">
-            <h1>Tech Changes Tracker</h1>
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Search">
-                <span class="search-icon">⌕</span>
+        <!-- File Browser View -->
+        <div class="file-browser active" id="fileBrowser">
+            <div class="header">
+                <h1>Tech Changes Trackers</h1>
+                <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+            <div class="file-list" id="fileList"></div>
         </div>
-        <div class="entries-container" id="entriesContainer"></div>
+
+        <!-- Tracker View -->
+        <div class="file-browser" id="trackerView">
+            <button class="back-btn" onclick="showFileBrowser()">← Back to Files</button>
+            <div class="header">
+                <h1>Tech Changes Tracker</h1>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search">
+                    <span class="search-icon">⌕</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+            <div class="entries-container" id="entriesContainer"></div>
+        </div>
     </div>
 
     <script>
@@ -388,9 +472,13 @@
             }
         });
 
+        // Current tracker file being viewed
+        let currentTrackerFile = null;
+
         // Check if user is already logged in
         if (localStorage.getItem('isAuthenticated') === 'true') {
             showMainContainer();
+            loadFileBrowser();
         }
 
         // Login form handler
@@ -411,14 +499,58 @@
         });
 
         // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            filterEntries(e.target.value.toLowerCase());
-        });
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                filterEntries(e.target.value.toLowerCase());
+            });
+        }
 
         function showMainContainer() {
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('mainContainer').style.display = 'block';
+            loadFileBrowser();
+        }
+
+        function loadFileBrowser() {
+            fetch('files.json')
+                .then(response => response.json())
+                .then(files => {
+                    displayFileList(files);
+                })
+                .catch(error => {
+                    console.error('Error loading files.json:', error);
+                    // Fallback: show default files
+                    displayFileList([
+                        { filename: 'index.html', title: 'Main Tracker', description: 'Primary tech changes tracker' },
+                        { filename: 'tech-changes-tracker.html', title: 'Tech Changes Tracker', description: 'Alternative tracker instance' }
+                    ]);
+                });
+        }
+
+        function displayFileList(files) {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = files.map(file => `
+                <div class="file-item" onclick="openTracker('${file.filename}')">
+                    <div class="file-item-title">${file.title}</div>
+                    <div class="file-item-filename">${file.filename}</div>
+                    <div class="file-item-description">${file.description || ''}</div>
+                </div>
+            `).join('');
+        }
+
+        function openTracker(filename) {
+            currentTrackerFile = filename;
+            document.getElementById('fileBrowser').classList.remove('active');
+            document.getElementById('trackerView').classList.add('active');
             loadEntries();
+        }
+
+        function showFileBrowser() {
+            currentTrackerFile = null;
+            document.getElementById('trackerView').classList.remove('active');
+            document.getElementById('fileBrowser').classList.add('active');
+            loadFileBrowser();
         }
 
         function logout() {
@@ -430,9 +562,10 @@
         }
 
         function loadEntries() {
-            // Load from localStorage, start with empty array if none exists
+            // Load from localStorage, use filename-based key
+            const storageKey = currentTrackerFile ? `techChanges_${currentTrackerFile}` : 'techChanges';
             let entries = [];
-            const stored = localStorage.getItem('techChanges');
+            const stored = localStorage.getItem(storageKey);
             if (stored) {
                 entries = JSON.parse(stored);
             }
@@ -440,7 +573,8 @@
         }
 
         function filterEntries(searchTerm) {
-            const stored = localStorage.getItem('techChanges');
+            const storageKey = currentTrackerFile ? `techChanges_${currentTrackerFile}` : 'techChanges';
+            const stored = localStorage.getItem(storageKey);
             const entries = stored ? JSON.parse(stored) : [];
             
             if (!searchTerm) {
@@ -644,10 +778,11 @@
 
         // Function to update entries (called when new changes are added)
         window.updateTechChanges = function(newEntry) {
-            const stored = localStorage.getItem('techChanges');
+            const storageKey = currentTrackerFile ? `techChanges_${currentTrackerFile}` : 'techChanges';
+            const stored = localStorage.getItem(storageKey);
             const entries = stored ? JSON.parse(stored) : [];
             entries.unshift(newEntry); // Add to beginning
-            localStorage.setItem('techChanges', JSON.stringify(entries));
+            localStorage.setItem(storageKey, JSON.stringify(entries));
             displayEntries(entries);
         };
     </script>

@@ -128,11 +128,25 @@ Works in all modern browsers that support:
 - LocalStorage API
 - CSS Grid and Flexbox
 
+## Multiple HTML Files
+
+The tracker supports multiple HTML tracker files. After login, you'll see a file browser listing all available trackers:
+
+1. **Add a new HTML file** - Create your tracker HTML file
+2. **Update files.json** - Add the file to the list:
+   ```bash
+   node update-files-list.js your-file.html "Your Title" "Description"
+   ```
+3. **Each file has separate data** - Each HTML file uses its own localStorage key (`techChanges_<filename>`)
+4. **Navigate between files** - Use the file browser to switch between trackers
+
 ## Files
 
-- `index.html` - Main application file (ready for GitHub Pages)
+- `index.html` - Main application file with file browser (ready for GitHub Pages)
+- `files.json` - Manifest of all HTML tracker files
 - `GITHUB_PAGES_SETUP.md` - Deployment instructions
 - `WORKFLOW.md` - Workflow integration guide
 - `SCAFFOLD_PROMPT.md` - Prompt for recreating in other projects
 - `example-entry.json` - Example entry structure
 - `update-entry.js` - Helper script for generating console code
+- `update-files-list.js` - Helper script to add files to files.json
